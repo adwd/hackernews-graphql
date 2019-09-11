@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	go build ./server/server.go
+	go build -o hn-server ./server/server.go
 
 .PHONY: run
 run:
