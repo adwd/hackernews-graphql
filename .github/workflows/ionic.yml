@@ -17,5 +17,7 @@ jobs:
         working-directory: ionic-app
       - run: npm test
         working-directory: ionic-app
+        env:
+          CI: "true"
       - run: npm run build
         working-directory: ionic-app
