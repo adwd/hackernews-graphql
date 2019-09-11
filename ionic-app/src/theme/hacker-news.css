@@ -1,0 +1,17 @@
+:root {
+  --ion-color-hack: #ff6600;
+  --ion-color-hack-rgb: 255, 102, 0;
+  --ion-color-hack-contrast: #000000;
+  --ion-color-hack-contrast-rgb: 0, 0, 0;
+  --ion-color-hack-shade: #e05a00;
+  --ion-color-hack-tint: #ff751a;
+}
+
+.ion-color-hack {
+  --ion-color-base: var(--ion-color-hack);
+  --ion-color-base-rgb: var(--ion-color-hack-rgb);
+  --ion-color-contrast: var(--ion-color-hack-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-hack-contrast-rgb);
+  --ion-color-shade: var(--ion-color-hack-shade);
+  --ion-color-tint: var(--ion-color-hack-tint);
+}
