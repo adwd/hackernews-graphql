@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/handler"
-	"github.com/adwd/til/hackernews-graphql/server"
+	"github.com/adwd/hackernews-graphql/server"
 )
 
 const defaultPort = "8080"

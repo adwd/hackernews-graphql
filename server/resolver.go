@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 
-	"github.com/adwd/til/hackernews-graphql/server/hackernews"
-	"github.com/adwd/til/hackernews-graphql/server/models"
+	"github.com/adwd/hackernews-graphql/server/hackernews"
+	"github.com/adwd/hackernews-graphql/server/models"
 )
 
 // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.

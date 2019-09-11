@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/adwd/til/hackernews-graphql/server/models"
+	"github.com/adwd/hackernews-graphql/server/models"
 	"golang.org/x/sync/errgroup"
 )
 
