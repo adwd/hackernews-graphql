@@ -15,8 +15,33 @@ import {
 } from '@ionic/react';
 import React from 'react';
 
+const query = `{
+  stories(limit: 10) {
+    id
+    title
+    url
+  }
+}`;
+
 const Home = () => {
   const [count, setCount] = React.useState(0);
+  const [result, setResult] = React.useState('');
+
+  React.useEffect(() => {
+    fetch('http://localhost:8080/query', {
+      body: JSON.stringify({ query }),
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(res => res.json())
+      .then(res => setResult(JSON.stringify(res, null, 2)));
+  }, []);
+
   return (
     <>
       <IonHeader>
@@ -31,11 +56,9 @@ const Home = () => {
             <IonCardTitle>Card Title</IonCardTitle>
           </IonCardHeader>
 
-          <IonCardContent>
-            Keep close to Natures heart... and break clear away, once in awhile,
-            and climb a mountain or spend a week in the woods. Wash your spirit
-            clean.
-          </IonCardContent>
+          <IonItem>
+            <IonLabel>{result}</IonLabel>
+          </IonItem>
         </IonCard>
 
         <IonCard>
