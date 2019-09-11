@@ -1,0 +1,19 @@
+name: React Native Web
+on:
+  push:
+    paths:
+      - "ReactNativeApp/*"
+      - ".github/workflows/react-native.yml"
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - run: yarn
+        working-directory: ReactNativeApp
+      - run: yarn build:web
+        working-directory: ReactNativeApp
