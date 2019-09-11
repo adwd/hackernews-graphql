@@ -3,15 +3,15 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: Stories
+// GraphQL fragment: StoryFragment
 // ====================================================
 
-export interface Stories_stories_kids {
+export interface StoryFragment_kids {
   __typename: "Comment";
   id: number;
 }
 
-export interface Stories_stories {
+export interface StoryFragment {
   __typename: "Story";
   id: number;
   title: string;
@@ -20,13 +20,5 @@ export interface Stories_stories {
   score: number;
   by: string;
   time: number;
-  kids: Stories_stories_kids[];
-}
-
-export interface Stories {
-  stories: Stories_stories[];
-}
-
-export interface StoriesVariables {
-  limit?: number | null;
+  kids: StoryFragment_kids[];
 }

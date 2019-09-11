@@ -87,8 +87,10 @@ func GetStory(ctx context.Context, id int) (*models.Story, error) {
 // GetOGPImage gets ogp image
 func GetOGPImage(url string) (*string, error) {
 	res, err := http.Get(url)
+	// if failed to access to specifed URL, return emtpy not error
 	if err != nil {
-		return nil, err
+		empty := ""
+		return &empty, nil
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
