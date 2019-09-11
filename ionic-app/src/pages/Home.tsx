@@ -14,33 +14,33 @@ import {
   IonButton,
 } from '@ionic/react';
 import React from 'react';
+import gql from 'graphql-tag';
+import { useQuery } from '@apollo/react-hooks';
+import { Stories, StoriesVariables } from '../graphql/__generated__/Stories';
 
-const query = `{
-  stories(limit: 10) {
-    id
-    title
-    url
+const STORIES = gql`
+  query Stories($limit: Int) {
+    stories(limit: $limit) {
+      id
+      title
+      url
+    }
   }
-}`;
+`;
 
 const Home = () => {
   const [count, setCount] = React.useState(0);
-  const [result, setResult] = React.useState('');
-
-  React.useEffect(() => {
-    fetch('http://localhost:8080/query', {
-      body: JSON.stringify({ query }),
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
+  const { loading, error, data } = useQuery<Stories, StoriesVariables>(
+    STORIES,
+    {
+      variables: {
+        limit: 2,
       },
-    })
-      .then(res => res.json())
-      .then(res => setResult(JSON.stringify(res, null, 2)));
-  }, []);
+    },
+  );
+
+  if (loading || !data) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
 
   return (
     <>
@@ -57,7 +57,7 @@ const Home = () => {
           </IonCardHeader>
 
           <IonItem>
-            <IonLabel>{result}</IonLabel>
+            <IonLabel>{JSON.stringify(data.stories, null, 2)}</IonLabel>
           </IonItem>
         </IonCard>
 
