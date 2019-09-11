@@ -27,7 +27,9 @@ jobs:
           fi
 
       - name: Build
-        run: make build
+        run: |
+          cd server
+          make build
 
   test:
     name: Test
@@ -53,4 +55,6 @@ jobs:
           fi
 
       - name: Test
-        run: make test
+        run: |
+          cd server
+          make test
