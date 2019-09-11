@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - "server/*"
+      - ".github/workflows/go.yml"
 jobs:
   build:
     name: Build
