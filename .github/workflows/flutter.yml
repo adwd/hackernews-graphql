@@ -14,14 +14,14 @@ jobs:
         with:
           flutter-version: "1.9.x"
           channel: "dev"
-      - name: enable flutter-web
+      - name: Enable flutter-web
         run: flutter config --enable-web
-      - name: get packages
+      - name: Get packages
         run: flutter pub get
         working-directory: hn_app
-      - name: test
+      - name: Test
         run: flutter test
         working-directory: hn_app
-      - name: build
+      - name: Build
         run: flutter build web
         working-directory: hn_app
