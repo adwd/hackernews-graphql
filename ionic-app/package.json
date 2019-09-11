@@ -11,6 +11,8 @@
     "@types/react-dom": "^16.8.5",
     "@types/react-router": "^5.0.3",
     "@types/react-router-dom": "^4.3.1",
+    "apollo": "^2.18.1",
+    "graphql-tag": "^2.10.1",
     "ionicons": "^4.6.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -23,7 +25,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate": "apollo client:codegen --localSchemaFile='../server/schema.graphql' --target typescript --includes='./src/graphql/**/*' --outputFlat src/graphql/__generated__"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -34,5 +37,6 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "devDependencies": {}
 }
