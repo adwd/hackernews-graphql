@@ -1,0 +1,21 @@
+name: Ionic App
+on:
+  push:
+    paths:
+      - "ionic-app/*"
+      - ".github/workflows/ionic.yml"
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - run: npm install
+        working-directory: ionic-app
+      - run: npm test
+        working-directory: ionic-app
+      - run: npm run build
+        working-directory: ionic-app
