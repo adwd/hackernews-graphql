@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 
+	"github.com/99designs/gqlgen/graphql"
+
 	"github.com/adwd/hackernews-graphql/server/hackernews"
 	"github.com/adwd/hackernews-graphql/server/models"
 )
@@ -58,6 +60,19 @@ func (r *storyResolver) OgpImage(ctx context.Context, obj *models.Story) (*strin
 }
 
 func (r *storyResolver) Kids(ctx context.Context, obj *models.Story) ([]*models.Comment, error) {
+	// if only id is required, supress to fetch comment
+	fields := graphql.CollectAllFields(ctx)
+	if len(fields) == 1 && fields[0] == "id" {
+		comments := []*models.Comment{}
+		for _, kid := range obj.Kids {
+			comments = append(comments, &models.Comment{
+				ID: kid,
+			})
+		}
+
+		return comments, nil
+	}
+
 	if obj == nil || len(obj.Kids) == 0 {
 		return []*models.Comment{}, nil
 	}

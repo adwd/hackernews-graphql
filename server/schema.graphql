@@ -6,7 +6,7 @@ type Story {
   time: Int!
   title: String!
   type: String!
-  url: String!
+  url: String # url is optional eg: https://hacker-news.firebaseio.com/v0/item/20951444.json?print=pretty
   ogpImage: String
   kids: [Comment!]!
 }
