@@ -19,7 +19,7 @@ const Home = () => {
     STORIES,
     {
       variables: {
-        limit: 20,
+        limit: 10,
       },
     },
   );

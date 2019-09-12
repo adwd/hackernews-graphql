@@ -23,7 +23,7 @@ func main() {
 	router := chi.NewRouter()
 
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
@@ -36,13 +36,14 @@ func main() {
 		WriteBufferSize: 1024,
 	}
 
-	router.Handle("/", handler.Playground("GraphQL playground", "/query"))
+	router.Handle("/playground", handler.Playground("GraphQL playground", "/query"))
 	router.Handle("/query",
 		handler.GraphQL(
 			server.NewExecutableSchema(server.Config{Resolvers: &server.Resolver{}}),
 			handler.WebsocketUpgrader(upgrader),
 		),
 	)
+	router.Handle("/*", http.FileServer(http.Dir("static")))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
