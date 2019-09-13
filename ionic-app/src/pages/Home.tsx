@@ -1,4 +1,11 @@
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/react';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonProgressBar,
+  IonText,
+} from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
@@ -19,13 +26,38 @@ const Home = () => {
     STORIES,
     {
       variables: {
-        limit: 20,
+        limit: 10,
       },
     },
   );
 
-  if (loading || !data) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+  if (loading)
+    return (
+      <>
+        <IonHeader>
+          <IonToolbar color="hack">
+            <IonTitle>Hacker News</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonProgressBar type="indeterminate"></IonProgressBar>
+      </>
+    );
+  if (error || !data)
+    return (
+      <>
+        <IonHeader>
+          <IonToolbar color="hack">
+            <IonTitle>Hacker News</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          <IonText color="danger">
+            <h1>Something went wrong</h1>
+          </IonText>
+          {JSON.stringify(error, null, 2)}
+        </IonContent>
+      </>
+    );
 
   return (
     <>
