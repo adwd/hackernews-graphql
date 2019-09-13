@@ -8,6 +8,9 @@ import {
   IonText,
   IonRefresher,
   IonRefresherContent,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
@@ -79,9 +82,15 @@ const Home = () => {
         <IonRefresher slot="fixed" onIonRefresh={onRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-        {data.stories.map(story => (
-          <Story story={story} key={story.id} />
-        ))}
+        <IonGrid>
+          <IonRow>
+            <IonCol sizeMd="8" sizeSm="12" offsetMd="2" offsetSm="0">
+              {data.stories.map(story => (
+                <Story story={story} key={story.id} />
+              ))}
+            </IonCol>
+          </IonRow>
+        </IonGrid>
       </IonContent>
     </>
   );
