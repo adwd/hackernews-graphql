@@ -1,15 +1,22 @@
 package hackernews
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/adwd/hackernews-graphql/server/models"
+	cache "github.com/patrickmn/go-cache"
 	"golang.org/x/sync/errgroup"
+)
+
+var (
+	c = cache.New(5*time.Minute, 10*time.Minute)
 )
 
 // GetTopStories get top stories
@@ -17,18 +24,12 @@ func GetTopStories(ctx context.Context, limit *int) ([]*models.Story, error) {
 	if limit == nil {
 		*limit = 50
 	}
-	res, err := http.Get("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty")
+	res, err := get("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty")
 	if err != nil {
 		return []*models.Story{}, err
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return []*models.Story{}, err
-	}
-	defer res.Body.Close()
-
-	storyIds, err := models.UnmarshalTopStories(body)
+	storyIds, err := models.UnmarshalTopStories(res)
 	if err != nil {
 		return []*models.Story{}, err
 	}
@@ -65,18 +66,12 @@ func GetTopStories(ctx context.Context, limit *int) ([]*models.Story, error) {
 
 // GetStory get story
 func GetStory(ctx context.Context, id int) (*models.Story, error) {
-	res, err := http.Get(fmt.Sprintf("https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty", id))
+	res, err := get(fmt.Sprintf("https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty", id))
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	story, err := models.UnmarshalStory(body)
+	story, err := models.UnmarshalStory(res)
 	if err != nil {
 		return nil, err
 	}
@@ -86,18 +81,17 @@ func GetStory(ctx context.Context, id int) (*models.Story, error) {
 
 // GetOGPImage gets ogp image
 func GetOGPImage(url string) (*string, error) {
-	res, err := http.Get(url)
+	res, err := get(url)
 	// if failed to access to specifed URL, return emtpy not error
 	if err != nil {
 		empty := ""
 		return &empty, nil
 	}
 
-	doc, err := goquery.NewDocumentFromReader(res.Body)
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(res))
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
 
 	urls := []string{}
 	doc.Find(`meta[property="og:image"]`).Each(func(i int, s *goquery.Selection) {
@@ -115,18 +109,12 @@ func GetOGPImage(url string) (*string, error) {
 }
 
 func GetComment(ctx context.Context, id int) (*models.Comment, error) {
-	res, err := http.Get(fmt.Sprintf("https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty", id))
+	res, err := get(fmt.Sprintf("https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty", id))
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	comment, err := models.UnmarshalComment(body)
+	comment, err := models.UnmarshalComment(res)
 	if err != nil {
 		return nil, err
 	}
@@ -170,4 +158,26 @@ func GetComments(ctx context.Context, ids []int) ([]*models.Comment, error) {
 	}
 
 	return comments, nil
+}
+
+func get(url string) ([]byte, error) {
+	cached, found := c.Get(url)
+	if found {
+		return cached.([]byte), nil
+	}
+
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	c.Set(url, body, cache.DefaultExpiration)
+
+	return body, nil
 }
