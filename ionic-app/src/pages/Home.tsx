@@ -32,7 +32,7 @@ const Home = () => {
     STORIES,
     {
       variables: {
-        limit: 10,
+        limit: 20,
       },
     },
   );
