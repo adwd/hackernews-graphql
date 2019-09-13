@@ -3,6 +3,7 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
+  IonCardContent,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
@@ -34,8 +35,11 @@ export const Story = ({ story }: { story: StoryFragment }) => {
         <IonCardHeader>
           <IonCardTitle>{story.title}</IonCardTitle>
           {getHost(story.url)}
-          <IonCardSubtitle color="medium">{storyDetail(story)}</IonCardSubtitle>
         </IonCardHeader>
+
+        <IonCardContent>
+          <IonCardSubtitle>{storyDetail(story)}</IonCardSubtitle>
+        </IonCardContent>
       </IonCard>
     </>
   );
