@@ -42,9 +42,9 @@ export const Story = ({ story }: { story: StoryFragment }) => {
 };
 
 function getCardAttribute(story: StoryFragment) {
-  return story.url
-    ? { href: story.url, target: '_blank', rel: 'noopener' }
-    : {};
+  // href attribute doesn't work correctly due to bug
+  // https://github.com/ionic-team/ionic/issues/19241
+  return story.url ? { onClick: () => window.open(story.url!, '_blank') } : {};
 }
 
 function getHost(url: string | null) {
