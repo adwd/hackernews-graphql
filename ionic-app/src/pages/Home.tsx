@@ -1,3 +1,4 @@
+import { RefresherEventDetail } from '@ionic/core';
 import {
   IonContent,
   IonHeader,
@@ -5,6 +6,8 @@ import {
   IonToolbar,
   IonProgressBar,
   IonText,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
@@ -22,7 +25,7 @@ const STORIES = gql`
 `;
 
 const Home = () => {
-  const { loading, error, data } = useQuery<Stories, StoriesVariables>(
+  const { loading, error, data, refetch } = useQuery<Stories, StoriesVariables>(
     STORIES,
     {
       variables: {
@@ -30,6 +33,12 @@ const Home = () => {
       },
     },
   );
+
+  const onRefresh = (ev: CustomEvent<RefresherEventDetail>) => {
+    refetch().then(() => {
+      ev.detail.complete();
+    });
+  };
 
   if (loading)
     return (
@@ -67,6 +76,9 @@ const Home = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+        <IonRefresher slot="fixed" onIonRefresh={onRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
         {data.stories.map(story => (
           <Story story={story} key={story.id} />
         ))}
