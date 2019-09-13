@@ -46,22 +46,14 @@ const Home = () => {
   if (loading)
     return (
       <>
-        <IonHeader>
-          <IonToolbar color="hack">
-            <IonTitle>Hacker News</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <HackerHeader />
         <IonProgressBar type="indeterminate"></IonProgressBar>
       </>
     );
   if (error || !data)
     return (
       <>
-        <IonHeader>
-          <IonToolbar color="hack">
-            <IonTitle>Hacker News</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <HackerHeader />
         <IonContent className="ion-padding">
           <IonText color="danger">
             <h1>Something went wrong</h1>
@@ -73,11 +65,7 @@ const Home = () => {
 
   return (
     <>
-      <IonHeader>
-        <IonToolbar color="hack">
-          <IonTitle>Hacker News</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      <HackerHeader />
       <IonContent className="ion-padding">
         <IonRefresher slot="fixed" onIonRefresh={onRefresh}>
           <IonRefresherContent></IonRefresherContent>
@@ -95,5 +83,13 @@ const Home = () => {
     </>
   );
 };
+
+const HackerHeader = () => (
+  <IonHeader>
+    <IonToolbar color="hack">
+      <IonTitle>Hacker News Clone</IonTitle>
+    </IonToolbar>
+  </IonHeader>
+);
 
 export default Home;
