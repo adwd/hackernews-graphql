@@ -8,6 +8,9 @@ import {
   IonText,
   IonRefresher,
   IonRefresherContent,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
@@ -29,7 +32,7 @@ const Home = () => {
     STORIES,
     {
       variables: {
-        limit: 10,
+        limit: 20,
       },
     },
   );
@@ -43,22 +46,14 @@ const Home = () => {
   if (loading)
     return (
       <>
-        <IonHeader>
-          <IonToolbar color="hack">
-            <IonTitle>Hacker News</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <HackerHeader />
         <IonProgressBar type="indeterminate"></IonProgressBar>
       </>
     );
   if (error || !data)
     return (
       <>
-        <IonHeader>
-          <IonToolbar color="hack">
-            <IonTitle>Hacker News</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <HackerHeader />
         <IonContent className="ion-padding">
           <IonText color="danger">
             <h1>Something went wrong</h1>
@@ -70,21 +65,31 @@ const Home = () => {
 
   return (
     <>
-      <IonHeader>
-        <IonToolbar color="hack">
-          <IonTitle>Hacker News</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      <HackerHeader />
       <IonContent className="ion-padding">
         <IonRefresher slot="fixed" onIonRefresh={onRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-        {data.stories.map(story => (
-          <Story story={story} key={story.id} />
-        ))}
+        <IonGrid>
+          <IonRow>
+            <IonCol sizeMd="8" sizeSm="12" offsetMd="2" offsetSm="0">
+              {data.stories.map(story => (
+                <Story story={story} key={story.id} />
+              ))}
+            </IonCol>
+          </IonRow>
+        </IonGrid>
       </IonContent>
     </>
   );
 };
+
+const HackerHeader = () => (
+  <IonHeader>
+    <IonToolbar color="hack">
+      <IonTitle>Hacker News Clone</IonTitle>
+    </IonToolbar>
+  </IonHeader>
+);
 
 export default Home;
