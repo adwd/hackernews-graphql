@@ -11,6 +11,9 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonIcon,
+  IonButtons,
+  IonButton,
 } from '@ionic/react';
 import React, { useCallback, useRef } from 'react';
 import gql from 'graphql-tag';
@@ -18,6 +21,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { Stories, StoriesVariables } from '../graphql/__generated__/Stories';
 import { STORY_FRAGMENT, Story } from '../components/Story';
 import { LazyLoader } from '../components/LazyLoader';
+import { logoGithub } from 'ionicons/icons';
 
 const limit = 20;
 
@@ -112,6 +116,18 @@ const HackerHeader = () => (
   <IonHeader>
     <IonToolbar color="hack">
       <IonTitle>Hacker News Clone</IonTitle>
+      <IonButtons slot="end">
+        <IonButton
+          onClick={() => {
+            window.open(
+              'https://github.com/adwd/hackernews-graphql/',
+              '_blank',
+            );
+          }}
+        >
+          <IonIcon slot="icon-only" icon={logoGithub} />
+        </IonButton>
+      </IonButtons>
     </IonToolbar>
   </IonHeader>
 );
