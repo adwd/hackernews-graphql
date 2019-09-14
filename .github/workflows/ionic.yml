@@ -2,8 +2,8 @@ name: Ionic App
 on:
   push:
     paths:
-      - "ionic-app/*"
-      - ".github/workflows/ionic.yml"
+      - 'ionic-app/*'
+      - '.github/workflows/ionic.yml'
 jobs:
   build:
     name: Build
@@ -12,12 +12,12 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v1
         with:
-          node-version: "10.x"
-      - run: npm install
+          node-version: '10.x'
+      - run: ADBLOCK=true npm install
         working-directory: ionic-app
       - run: npm test
         working-directory: ionic-app
         env:
-          CI: "true"
+          CI: 'true'
       - run: npm run build
         working-directory: ionic-app

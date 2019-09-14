@@ -2,8 +2,8 @@ name: React Native Web
 on:
   push:
     paths:
-      - "ReactNativeApp/*"
-      - ".github/workflows/react-native.yml"
+      - 'ReactNativeApp/*'
+      - '.github/workflows/react-native.yml'
 jobs:
   build:
     name: Build
@@ -12,8 +12,8 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v1
         with:
-          node-version: "10.x"
-      - run: yarn
+          node-version: '10.x'
+      - run: ADBLOCK=true yarn
         working-directory: ReactNativeApp
       - run: yarn build:web
         working-directory: ReactNativeApp
