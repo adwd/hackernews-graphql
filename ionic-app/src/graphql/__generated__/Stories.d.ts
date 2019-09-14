@@ -29,4 +29,5 @@ export interface Stories {
 
 export interface StoriesVariables {
   limit?: number | null;
+  offset?: number | null;
 }

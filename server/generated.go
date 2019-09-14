@@ -56,7 +56,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Comment func(childComplexity int, id int) int
-		Stories func(childComplexity int, limit *int) int
+		Stories func(childComplexity int, limit *int, offset *int) int
 		Story   func(childComplexity int, id int) int
 	}
 
@@ -78,7 +78,7 @@ type CommentResolver interface {
 	Kids(ctx context.Context, obj *models.Comment) ([]*models.Comment, error)
 }
 type QueryResolver interface {
-	Stories(ctx context.Context, limit *int) ([]*models.Story, error)
+	Stories(ctx context.Context, limit *int, offset *int) ([]*models.Story, error)
 	Story(ctx context.Context, id int) (*models.Story, error)
 	Comment(ctx context.Context, id int) (*models.Comment, error)
 }
@@ -173,7 +173,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Stories(childComplexity, args["limit"].(*int)), true
+		return e.complexity.Query.Stories(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
 
 	case "Query.story":
 		if e.complexity.Query.Story == nil {
@@ -314,7 +314,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
   time: Int!
   title: String!
   type: String!
-  url: String!
+  url: String # url is optional eg: https://hacker-news.firebaseio.com/v0/item/20951444.json?print=pretty
   ogpImage: String
   kids: [Comment!]!
 }
@@ -330,7 +330,7 @@ type Comment {
 }
 
 type Query {
-  stories(limit: Int): [Story!]!
+  stories(limit: Int, offset: Int): [Story!]!
   story(id: ID!): Story
   comment(id: ID!): Comment
 }
@@ -380,6 +380,14 @@ func (ec *executionContext) field_Query_stories_args(ctx context.Context, rawArg
 		}
 	}
 	args["limit"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg1
 	return args, nil
 }
 
@@ -689,7 +697,7 @@ func (ec *executionContext) _Comment_kids(ctx context.Context, field graphql.Col
 	res := resTmp.([]*models.Comment)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
+	return ec.marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_stories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -718,7 +726,7 @@ func (ec *executionContext) _Query_stories(ctx context.Context, field graphql.Co
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Stories(rctx, args["limit"].(*int))
+		return ec.resolvers.Query().Stories(rctx, args["limit"].(*int), args["offset"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -733,7 +741,7 @@ func (ec *executionContext) _Query_stories(ctx context.Context, field graphql.Co
 	res := resTmp.([]*models.Story)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNStory2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx, field.Selections, res)
+	return ec.marshalNStory2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_story(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -774,7 +782,7 @@ func (ec *executionContext) _Query_story(ctx context.Context, field graphql.Coll
 	res := resTmp.(*models.Story)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOStory2ᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx, field.Selections, res)
+	return ec.marshalOStory2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -815,7 +823,7 @@ func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.Co
 	res := resTmp.(*models.Comment)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOComment2ᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
+	return ec.marshalOComment2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1178,15 +1186,12 @@ func (ec *executionContext) _Story_url(ctx context.Context, field graphql.Collec
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Story_ogpImage(ctx context.Context, field graphql.CollectedField, obj *models.Story) (ret graphql.Marshaler) {
@@ -1257,7 +1262,7 @@ func (ec *executionContext) _Story_kids(ctx context.Context, field graphql.Colle
 	res := resTmp.([]*models.Comment)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
+	return ec.marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2599,9 +2604,6 @@ func (ec *executionContext) _Story(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "url":
 			out.Values[i] = ec._Story_url(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "ogpImage":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -2897,11 +2899,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNComment2githubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v models.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalNComment2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v models.Comment) graphql.Marshaler {
 	return ec._Comment(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v []*models.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v []*models.Comment) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2925,7 +2927,7 @@ func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋha
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNComment2ᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, sel, v[i])
+			ret[i] = ec.marshalNComment2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2938,7 +2940,7 @@ func (ec *executionContext) marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋha
 	return ret
 }
 
-func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v *models.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v *models.Comment) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2976,11 +2978,11 @@ func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNStory2githubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v models.Story) graphql.Marshaler {
+func (ec *executionContext) marshalNStory2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v models.Story) graphql.Marshaler {
 	return ec._Story(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNStory2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v []*models.Story) graphql.Marshaler {
+func (ec *executionContext) marshalNStory2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v []*models.Story) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3004,7 +3006,7 @@ func (ec *executionContext) marshalNStory2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋhack
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNStory2ᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx, sel, v[i])
+			ret[i] = ec.marshalNStory2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3017,7 +3019,7 @@ func (ec *executionContext) marshalNStory2ᚕᚖgithubᚗcomᚋadwdᚋtilᚋhack
 	return ret
 }
 
-func (ec *executionContext) marshalNStory2ᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v *models.Story) graphql.Marshaler {
+func (ec *executionContext) marshalNStory2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v *models.Story) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3290,11 +3292,11 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalOComment2githubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v models.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalOComment2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v models.Comment) graphql.Marshaler {
 	return ec._Comment(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v *models.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v *models.Comment) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -3324,11 +3326,11 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return ec.marshalOInt2int(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalOStory2githubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v models.Story) graphql.Marshaler {
+func (ec *executionContext) marshalOStory2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v models.Story) graphql.Marshaler {
 	return ec._Story(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOStory2ᚖgithubᚗcomᚋadwdᚋtilᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v *models.Story) graphql.Marshaler {
+func (ec *executionContext) marshalOStory2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐStory(ctx context.Context, sel ast.SelectionSet, v *models.Story) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

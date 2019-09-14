@@ -20,9 +20,17 @@ var (
 )
 
 // GetTopStories get top stories
-func GetTopStories(ctx context.Context, limit *int) ([]*models.Story, error) {
-	if limit == nil {
-		*limit = 50
+func GetTopStories(ctx context.Context, _limit, _offset *int) ([]*models.Story, error) {
+	var limit, offset int
+	if _limit == nil || *_limit > 50 {
+		limit = 50
+	} else {
+		limit = *_limit
+	}
+	if _offset == nil || *_offset > 500 {
+		offset = 0
+	} else {
+		offset = *_offset
 	}
 	res, err := get("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty")
 	if err != nil {
@@ -33,16 +41,17 @@ func GetTopStories(ctx context.Context, limit *int) ([]*models.Story, error) {
 	if err != nil {
 		return []*models.Story{}, err
 	}
-	length := *limit
-	if len(storyIds) < *limit {
-		length = len(storyIds)
+	storyIds = storyIds[offset : limit+offset]
+
+	if len(storyIds) < limit {
+		limit = len(storyIds)
 	}
 
 	var m sync.Mutex
 	stories := []*models.Story{}
 	eg, ctx := errgroup.WithContext(ctx)
 	for index, s := range storyIds {
-		if index > length {
+		if index > limit {
 			break
 		}
 		id := s
@@ -125,7 +134,7 @@ func GetComment(ctx context.Context, id int) (*models.Comment, error) {
 // GetComments gets comments
 func GetComments(ctx context.Context, ids []int) ([]*models.Comment, error) {
 	eg, ctx := errgroup.WithContext(ctx)
-	commentChan := make(chan *models.Comment, 8)
+	commentChan := make(chan *models.Comment, 4)
 
 	for _, id := range ids {
 		id = id
