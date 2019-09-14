@@ -6,7 +6,7 @@ type Props = {
 };
 
 export const LazyLoader = ({ load }: Props) => {
-  const measuredRef = useCallback(
+  const ref = useCallback(
     node => {
       if (node !== null) {
         const observer = new IntersectionObserver(
@@ -16,9 +16,8 @@ export const LazyLoader = ({ load }: Props) => {
             }
           },
           {
-            root: document.querySelector('.ion-page'),
-            rootMargin: '100%',
-            threshold: 0.2,
+            rootMargin: '480px 480px',
+            threshold: 0.1,
           },
         );
         observer.observe(node);
@@ -27,5 +26,9 @@ export const LazyLoader = ({ load }: Props) => {
     [load],
   );
 
-  return <IonSpinner ref={measuredRef} style={{ width: '100%' }} />;
+  return (
+    <div style={{ padding: '24px' }}>
+      <IonSpinner ref={ref} style={{ width: '100%' }} />
+    </div>
+  );
 };
