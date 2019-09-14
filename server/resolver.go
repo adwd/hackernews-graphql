@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/99designs/gqlgen/graphql"
-
 	"github.com/adwd/hackernews-graphql/server/hackernews"
 	"github.com/adwd/hackernews-graphql/server/models"
 )
@@ -38,8 +37,8 @@ func (r *commentResolver) Kids(ctx context.Context, obj *models.Comment) ([]*mod
 
 type queryResolver struct{ *Resolver }
 
-func (r *queryResolver) Stories(ctx context.Context, limit *int) ([]*models.Story, error) {
-	return hackernews.GetTopStories(ctx, limit)
+func (r *queryResolver) Stories(ctx context.Context, limit, offset *int) ([]*models.Story, error) {
+	return hackernews.GetTopStories(ctx, limit, offset)
 }
 
 func (r *queryResolver) Story(ctx context.Context, id int) (*models.Story, error) {

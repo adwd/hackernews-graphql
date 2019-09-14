@@ -22,7 +22,7 @@ type Comment {
 }
 
 type Query {
-  stories(limit: Int): [Story!]!
+  stories(limit: Int, offset: Int): [Story!]!
   story(id: ID!): Story
   comment(id: ID!): Comment
 }
