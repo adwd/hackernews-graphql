@@ -12,7 +12,7 @@ import {
   IonRow,
   IonCol,
 } from '@ionic/react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 import { Stories, StoriesVariables } from '../graphql/__generated__/Stories';
@@ -30,8 +30,6 @@ const STORIES = gql`
   ${STORY_FRAGMENT}
 `;
 
-let offset = 0;
-
 const Home = () => {
   const { loading, error, data, refetch, fetchMore } = useQuery<
     Stories,
@@ -39,7 +37,7 @@ const Home = () => {
   >(STORIES, {
     variables: {
       limit,
-      offset,
+      offset: 0,
     },
   });
 
@@ -49,11 +47,12 @@ const Home = () => {
     });
   };
 
+  const offsetRef = useRef<number>(0);
   const loadNextPage = useCallback(() => {
-    offset = offset + limit;
+    offsetRef.current = offsetRef.current + limit;
     fetchMore({
       variables: {
-        offset,
+        offset: offsetRef.current,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev;
@@ -95,8 +94,10 @@ const Home = () => {
         <IonGrid style={{ paddingBottom: '24px' }}>
           <IonRow>
             <IonCol sizeMd="8" sizeSm="12" offsetMd="2" offsetSm="0">
-              {data.stories.map(story => (
-                <Story story={story} key={story.id} />
+              {data.stories.map((story, index) => (
+                // Hacker News APIまわりの実装の都合でfetchMoreのときに
+                // 同じStoryが含まれる事があることを考慮したkeyにする
+                <Story story={story} key={`${index}-${story.id}`} />
               ))}
               <LazyLoader load={loadNextPage} />
             </IonCol>
