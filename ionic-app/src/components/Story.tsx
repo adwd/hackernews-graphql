@@ -3,7 +3,7 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
-  IonCardContent,
+  IonItem,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
@@ -28,24 +28,31 @@ export const STORY_FRAGMENT = gql`
 export const Story = ({ story }: { story: StoryFragment }) => {
   return (
     <>
-      <IonCard {...getCardAttribute(story)}>
+      <IonCard>
         {story.ogpImage ? (
-          <img src={story.ogpImage} alt={story.title}></img>
+          <img {...cardURL(story)} src={story.ogpImage} alt={story.title}></img>
         ) : null}
-        <IonCardHeader>
+        <IonCardHeader {...cardURL(story)}>
           <IonCardTitle>{story.title}</IonCardTitle>
           {getHost(story.url)}
         </IonCardHeader>
-
-        <IonCardContent>
+        <IonItem
+          href="#"
+          onClick={() =>
+            window.open(
+              `https://news.ycombinator.com/item?id=${story.id}`,
+              '_blank',
+            )
+          }
+        >
           <IonCardSubtitle>{storyDetail(story)}</IonCardSubtitle>
-        </IonCardContent>
+        </IonItem>
       </IonCard>
     </>
   );
 };
 
-function getCardAttribute(story: StoryFragment) {
+function cardURL(story: StoryFragment) {
   // href attribute doesn't work correctly due to bug
   // https://github.com/ionic-team/ionic/issues/19241
   return story.url ? { onClick: () => window.open(story.url!, '_blank') } : {};
