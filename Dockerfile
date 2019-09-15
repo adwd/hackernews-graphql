@@ -15,7 +15,7 @@ WORKDIR /app
 
 COPY ionic-app .
 
-RUN npm install
+RUN ADBLOCK=true npm install
 RUN npm run build
 
 
