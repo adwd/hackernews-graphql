@@ -107,6 +107,6 @@ workflows:
             - ionic-test
             - server-build
             - server-test
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: master
