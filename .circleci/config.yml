@@ -51,7 +51,7 @@ jobs:
           command: npm test
           working_directory: ~/hackernews-graphql/ionic-app
 
-  server-test:
+  server-build:
     executor: go
     steps:
       - checkout
@@ -59,7 +59,7 @@ jobs:
           command: go get -v -t -d ./...
           working_directory: ~/hackernews-graphql/server
       - run:
-          command: make test
+          command: make build
           working_directory: ~/hackernews-graphql/server
 
   server-test:
@@ -70,7 +70,7 @@ jobs:
           command: go get -v -t -d ./...
           working_directory: ~/hackernews-graphql/server
       - run:
-          command: make build
+          command: make test
           working_directory: ~/hackernews-graphql/server
 
 workflows:
