@@ -22,8 +22,14 @@ executors:
     docker:
       - image: circleci/node:10
     working_directory: ~/hackernews-graphql
+
+  go:
+    docker:
+      - image: circleci/go:1.13
+    working_directory: ~/hackernews-graphql
+
 jobs:
-  build:
+  ionic-build:
     executor: ionic-app
     steps:
       - checkout
@@ -33,7 +39,8 @@ jobs:
       - run:
           command: npm run build
           working_directory: ~/hackernews-graphql/ionic-app
-  test:
+
+  ionic-test:
     executor: ionic-app
     steps:
       - checkout
@@ -44,9 +51,33 @@ jobs:
           command: npm test
           working_directory: ~/hackernews-graphql/ionic-app
 
+  server-test:
+    executor: go
+    steps:
+      - checkout
+      - run:
+          command: go get -v -t -d ./...
+          working_directory: ~/hackernews-graphql/server
+      - run:
+          command: make test
+          working_directory: ~/hackernews-graphql/server
+
+  server-test:
+    executor: go
+    steps:
+      - checkout
+      - run:
+          command: go get -v -t -d ./...
+          working_directory: ~/hackernews-graphql/server
+      - run:
+          command: make build
+          working_directory: ~/hackernews-graphql/server
+
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - build
-      - test
+      - ionic-build
+      - ionic-test
+      - server-build
+      - server-test
