@@ -1,7 +1,6 @@
 version: 2.1
 executors:
   ionic-app:
-    working_directory: ~/hackernews-graphql/ionic-app
     docker:
       - image: circleci/node:10
 jobs:
@@ -9,14 +8,22 @@ jobs:
     executor: ionic-app
     steps:
       - checkout
-      - run: ADBLOCK=true npm ci
-      - run: npm run build
+      - run:
+          command: ADBLOCK=true npm ci
+          working_directory: ~/hackernews-graphql/ionic-app
+      - run:
+          command: npm run build
+          working_directory: ~/hackernews-graphql/ionic-app
   test:
     executor: ionic-app
     steps:
       - checkout
-      - run: ADBLOCK=true npm ci
-      - run: npm test
+      - run:
+          command: ADBLOCK=true npm ci
+          working_directory: ~/hackernews-graphql/ionic-app
+      - run:
+          command: npm test
+          working_directory: ~/hackernews-graphql/ionic-app
 workflows:
   version: 2
   build_and_test:
