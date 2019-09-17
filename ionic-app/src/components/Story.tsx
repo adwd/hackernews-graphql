@@ -4,11 +4,13 @@ import {
   IonCardSubtitle,
   IonCardTitle,
   IonItem,
+  IonIcon,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
 import { fromUnixTime, differenceInHours } from 'date-fns';
 import { StoryFragment } from '../graphql/__generated__/StoryFragment';
+import { open } from 'ionicons/icons';
 
 export const STORY_FRAGMENT = gql`
   fragment StoryFragment on Story {
@@ -46,6 +48,7 @@ export const Story = ({ story }: { story: StoryFragment }) => {
           }
         >
           <IonCardSubtitle>{storyDetail(story)}</IonCardSubtitle>
+          <IonIcon icon={open} slot="end" />
         </IonItem>
       </IonCard>
     </>
