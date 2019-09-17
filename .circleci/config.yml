@@ -14,7 +14,7 @@ commands:
           command: ADBLOCK=true npm ci
           working_directory: << parameters.path >>
       - save_cache:
-          key: << parameters.naprefixe >>-{{ checksum "<< parameters.path >>/package-lock.json" }}
+          key: << parameters.prefix >>-{{ checksum "<< parameters.path >>/package-lock.json" }}
           paths:
             - << parameters.path >>/node_modules
 executors:
