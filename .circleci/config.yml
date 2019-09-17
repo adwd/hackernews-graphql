@@ -103,7 +103,6 @@ workflows:
       - server-test
   deploy:
     jobs:
-    jobs:
       - ionic-build
       - ionic-test
       - server-build
