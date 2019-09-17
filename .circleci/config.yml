@@ -1,17 +1,18 @@
 version: 2.1
-jobs:
-  build:
+executors:
+  ionic-app:
+    working_directory: ~/hackernews-graphql/ionic-app
     docker:
       - image: circleci/node:10
-    working_directory: ~/hackernews-graphql/ionic-app
+jobs:
+  build:
+    executor: ionic-app
     steps:
       - checkout
       - run: ADBLOCK=true npm ci
       - run: npm run build
   test:
-    docker:
-      - image: circleci/node:10
-    working_directory: ~/hackernews-graphql/ionic-app
+    executor: ionic-app
     steps:
       - checkout
       - run: ADBLOCK=true npm ci
