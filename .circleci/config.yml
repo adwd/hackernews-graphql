@@ -95,13 +95,7 @@ jobs:
 
 workflows:
   version: 2
-  build_and_test:
-    jobs:
-      - ionic-build
-      - ionic-test
-      - server-build
-      - server-test
-  deploy:
+  build:
     jobs:
       - ionic-build
       - ionic-test
