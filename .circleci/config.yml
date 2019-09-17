@@ -9,9 +9,15 @@ jobs:
     executor: ionic-app
     steps:
       - checkout
+      - restore_cache:
+          key: ionic-app-{{ checksum "~/hackernews-graphql/ionic-app/package-lock.json" }}
       - run:
           command: ADBLOCK=true npm ci
           working_directory: ~/hackernews-graphql/ionic-app
+      - save_cache:
+          key: ionic-app-{{ checksum "~/hackernews-graphql/ionic-app/package-lock.json" }}
+          paths:
+            - ~/hackernews-graphql/ionic-app/node_modules
       - run:
           command: npm run build
           working_directory: ~/hackernews-graphql/ionic-app
@@ -19,9 +25,15 @@ jobs:
     executor: ionic-app
     steps:
       - checkout
+      - restore_cache:
+          key: ionic-app-{{ checksum "~/hackernews-graphql/ionic-app/package-lock.json" }}
       - run:
           command: ADBLOCK=true npm ci
           working_directory: ~/hackernews-graphql/ionic-app
+      - save_cache:
+          key: ionic-app-{{ checksum "~/hackernews-graphql/ionic-app/package-lock.json" }}
+          paths:
+            - ~/hackernews-graphql/ionic-app/node_modules
       - run:
           command: npm test
           working_directory: ~/hackernews-graphql/ionic-app
