@@ -3,7 +3,7 @@ commands:
   npm-ci:
     description: "npm ci with cache"
     parameters:
-      name:
+      prefix:
         type: string
       path:
         type: string
@@ -28,7 +28,7 @@ jobs:
     steps:
       - checkout
       - npm-ci:
-          name: ionic-app
+          prefix: ionic-app
           path: ~/hackernews-graphql/ionic-app/
       - run:
           command: npm run build
@@ -38,7 +38,7 @@ jobs:
     steps:
       - checkout
       - npm-ci:
-          name: ionic-app
+          prefix: ionic-app
           path: ~/hackernews-graphql/ionic-app/
       - run:
           command: npm test
