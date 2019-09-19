@@ -1,9 +1,6 @@
 import { RefresherEventDetail } from '@ionic/core';
 import {
   IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
   IonProgressBar,
   IonText,
   IonRefresher,
@@ -11,9 +8,6 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonIcon,
-  IonButtons,
-  IonButton,
 } from '@ionic/react';
 import React, { useCallback, useRef } from 'react';
 import gql from 'graphql-tag';
@@ -21,7 +15,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { Stories, StoriesVariables } from '../graphql/__generated__/Stories';
 import { STORY_FRAGMENT, Story } from '../components/Story';
 import { LazyLoader } from '../components/LazyLoader';
-import { logoGithub } from 'ionicons/icons';
+import { AppHeader } from '../components/AppHeader';
 
 const limit = 20;
 
@@ -34,7 +28,7 @@ const STORIES = gql`
   ${STORY_FRAGMENT}
 `;
 
-const Home = () => {
+export const Home = () => {
   const { loading, error, data, refetch, fetchMore } = useQuery<
     Stories,
     StoriesVariables
@@ -71,14 +65,14 @@ const Home = () => {
   if (loading)
     return (
       <>
-        <HackerHeader />
+        <AppHeader />
         <IonProgressBar type="indeterminate"></IonProgressBar>
       </>
     );
   if (error || !data)
     return (
       <>
-        <HackerHeader />
+        <AppHeader />
         <IonContent className="ion-padding">
           <IonText color="danger">
             <h1>Something went wrong</h1>
@@ -90,7 +84,7 @@ const Home = () => {
 
   return (
     <>
-      <HackerHeader />
+      <AppHeader />
       <IonContent className="ion-padding">
         <IonRefresher slot="fixed" onIonRefresh={onRefresh}>
           <IonRefresherContent></IonRefresherContent>
@@ -111,25 +105,3 @@ const Home = () => {
     </>
   );
 };
-
-const HackerHeader = () => (
-  <IonHeader>
-    <IonToolbar color="hack">
-      <IonTitle>Hacker News Clone</IonTitle>
-      <IonButtons slot="end">
-        <IonButton
-          onClick={() => {
-            window.open(
-              'https://github.com/adwd/hackernews-graphql/',
-              '_blank',
-            );
-          }}
-        >
-          <IonIcon slot="icon-only" icon={logoGithub} />
-        </IonButton>
-      </IonButtons>
-    </IonToolbar>
-  </IonHeader>
-);
-
-export default Home;

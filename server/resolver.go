@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/adwd/hackernews-graphql/server/hackernews"
@@ -47,6 +48,19 @@ func (r *queryResolver) Story(ctx context.Context, id int) (*models.Story, error
 
 func (r *queryResolver) Comment(ctx context.Context, id int) (*models.Comment, error) {
 	return hackernews.GetComment(ctx, id)
+}
+
+func (r *queryResolver) Comments(ctx context.Context, parentID int) ([]*models.Comment, error) {
+	story, err := hackernews.GetStory(ctx, parentID)
+	if err != nil {
+		return nil, err
+	}
+	ids := []int{}
+	for _, id := range story.Kids {
+		ids = append(ids, int(id))
+	}
+	fmt.Println(ids)
+	return hackernews.GetComments(ctx, ids)
 }
 
 type storyResolver struct{ *Resolver }

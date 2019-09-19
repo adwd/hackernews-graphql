@@ -2,7 +2,8 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import { IonApp, IonPage, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
+import { Home } from './pages/Home';
+import { CommentPage } from './pages/CommentPage';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -31,6 +32,7 @@ const App: React.FunctionComponent = () => (
       <IonPage>
         <IonRouterOutlet>
           <Route path="/" component={Home} exact={true} />
+          <Route path="/:id" component={CommentPage} exact={true} />
         </IonRouterOutlet>
       </IonPage>
     </IonReactRouter>

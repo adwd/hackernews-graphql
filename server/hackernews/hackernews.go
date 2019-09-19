@@ -136,8 +136,8 @@ func GetComments(ctx context.Context, ids []int) ([]*models.Comment, error) {
 	eg, ctx := errgroup.WithContext(ctx)
 	commentChan := make(chan *models.Comment, 4)
 
-	for _, id := range ids {
-		id = id
+	for _, _id := range ids {
+		id := _id
 		eg.Go(func() error {
 			comment, err := GetComment(ctx, id)
 			if err != nil {

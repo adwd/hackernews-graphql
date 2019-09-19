@@ -5,6 +5,7 @@ import {
   IonCardTitle,
   IonItem,
   IonIcon,
+  IonText,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
@@ -32,12 +33,20 @@ export const Story = ({ story }: { story: StoryFragment }) => {
     <>
       <IonCard>
         {story.ogpImage ? (
-          <img {...cardURL(story)} src={story.ogpImage} alt={story.title}></img>
+          <a href={`/${story.id}`}>
+            <img src={story.ogpImage} alt={story.title}></img>
+          </a>
         ) : null}
-        <IonCardHeader {...cardURL(story)}>
-          <IonCardTitle>{story.title}</IonCardTitle>
-          {getHost(story.url)}
-        </IonCardHeader>
+        <a href={`/${story.id}`} style={{ textDecoration: 'none' }}>
+          <IonCardHeader style={{ padding: '0 16px' }}>
+            <IonCardTitle>
+              <IonText>
+                <h3>{story.title}</h3>
+              </IonText>
+            </IonCardTitle>
+            <IonCardSubtitle>{getHost(story.url)}</IonCardSubtitle>
+          </IonCardHeader>
+        </a>
         <IonItem
           href="#"
           onClick={() =>
@@ -66,7 +75,7 @@ function getHost(url: string | null) {
     return null;
   }
   const u = new URL(url);
-  return <IonCardSubtitle>{u.host}</IonCardSubtitle>;
+  return u.host;
 }
 
 function storyDetail(story: StoryFragment): string {

@@ -55,9 +55,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Comment func(childComplexity int, id int) int
-		Stories func(childComplexity int, limit *int, offset *int) int
-		Story   func(childComplexity int, id int) int
+		Comment  func(childComplexity int, id int) int
+		Comments func(childComplexity int, parentID int) int
+		Stories  func(childComplexity int, limit *int, offset *int) int
+		Story    func(childComplexity int, id int) int
 	}
 
 	Story struct {
@@ -81,6 +82,7 @@ type QueryResolver interface {
 	Stories(ctx context.Context, limit *int, offset *int) ([]*models.Story, error)
 	Story(ctx context.Context, id int) (*models.Story, error)
 	Comment(ctx context.Context, id int) (*models.Comment, error)
+	Comments(ctx context.Context, parentID int) ([]*models.Comment, error)
 }
 type StoryResolver interface {
 	OgpImage(ctx context.Context, obj *models.Story) (*string, error)
@@ -162,6 +164,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Comment(childComplexity, args["id"].(int)), true
+
+	case "Query.comments":
+		if e.complexity.Query.Comments == nil {
+			break
+		}
+
+		args, err := ec.field_Query_comments_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Comments(childComplexity, args["parentId"].(int)), true
 
 	case "Query.stories":
 		if e.complexity.Query.Stories == nil {
@@ -333,6 +347,7 @@ type Query {
   stories(limit: Int, offset: Int): [Story!]!
   story(id: ID!): Story
   comment(id: ID!): Comment
+  comments(parentId: ID!): [Comment!]
 }
 `},
 )
@@ -366,6 +381,20 @@ func (ec *executionContext) field_Query_comment_args(ctx context.Context, rawArg
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_comments_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["parentId"]; ok {
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["parentId"] = arg0
 	return args, nil
 }
 
@@ -824,6 +853,47 @@ func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.Co
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOComment2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_comments(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_comments_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Comments(rctx, args["parentId"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Comment)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOComment2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2541,6 +2611,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_comment(ctx, field)
 				return res
 			})
+		case "comments":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_comments(ctx, field)
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -3294,6 +3375,46 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 
 func (ec *executionContext) marshalOComment2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v models.Comment) graphql.Marshaler {
 	return ec._Comment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOComment2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v []*models.Comment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNComment2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx context.Context, sel ast.SelectionSet, v *models.Comment) graphql.Marshaler {
