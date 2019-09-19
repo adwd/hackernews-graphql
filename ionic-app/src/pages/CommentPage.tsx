@@ -17,6 +17,8 @@ const COMMENT_FRAGMENT = gql`
   }
 `;
 
+// Since GraphQL cannot create recursive query,
+// define a query with 5 depth
 const COMMENTS = gql`
   query Comments($parentId: ID!) {
     comments(parentId: $parentId) {
