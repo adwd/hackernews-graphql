@@ -6,6 +6,7 @@ import {
   IonItem,
   IonIcon,
   IonText,
+  IonImg,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
@@ -34,7 +35,7 @@ export const Story = ({ story }: { story: StoryFragment }) => {
       <IonCard>
         {story.ogpImage ? (
           <a href={`/${story.id}`}>
-            <img src={story.ogpImage} alt={story.title}></img>
+            <IonImg src={story.ogpImage} alt={story.title}></IonImg>
           </a>
         ) : null}
         <a href={`/${story.id}`} style={{ textDecoration: 'none' }}>

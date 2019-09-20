@@ -6,6 +6,23 @@
 // GraphQL query operation: Comments
 // ====================================================
 
+export interface Comments_story_kids {
+  __typename: "Comment";
+  id: number;
+}
+
+export interface Comments_story {
+  __typename: "Story";
+  id: number;
+  title: string;
+  url: string | null;
+  ogpImage: string | null;
+  score: number;
+  by: string;
+  time: number;
+  kids: Comments_story_kids[];
+}
+
 export interface Comments_comments_kids_kids_kids_kids {
   __typename: "Comment";
   id: number;
@@ -61,6 +78,7 @@ export interface Comments_comments {
 }
 
 export interface Comments {
+  story: Comments_story | null;
   comments: Comments_comments[] | null;
 }
 
