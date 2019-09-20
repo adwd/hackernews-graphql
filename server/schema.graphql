@@ -25,4 +25,5 @@ type Query {
   stories(limit: Int, offset: Int): [Story!]!
   story(id: ID!): Story
   comment(id: ID!): Comment
+  comments(parentId: ID!): [Comment!]
 }

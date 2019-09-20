@@ -5,6 +5,8 @@ import {
   IonCardTitle,
   IonItem,
   IonIcon,
+  IonText,
+  IonImg,
 } from '@ionic/react';
 import React from 'react';
 import gql from 'graphql-tag';
@@ -32,12 +34,20 @@ export const Story = ({ story }: { story: StoryFragment }) => {
     <>
       <IonCard>
         {story.ogpImage ? (
-          <img {...cardURL(story)} src={story.ogpImage} alt={story.title}></img>
+          <a href={`/${story.id}`}>
+            <IonImg src={story.ogpImage} alt={story.title}></IonImg>
+          </a>
         ) : null}
-        <IonCardHeader {...cardURL(story)}>
-          <IonCardTitle>{story.title}</IonCardTitle>
-          {getHost(story.url)}
-        </IonCardHeader>
+        <a href={`/${story.id}`} style={{ textDecoration: 'none' }}>
+          <IonCardHeader style={{ padding: '0 16px' }}>
+            <IonCardTitle>
+              <IonText>
+                <h3>{story.title}</h3>
+              </IonText>
+            </IonCardTitle>
+            <IonCardSubtitle>{getHost(story.url)}</IonCardSubtitle>
+          </IonCardHeader>
+        </a>
         <IonItem
           href="#"
           onClick={() =>
@@ -55,18 +65,12 @@ export const Story = ({ story }: { story: StoryFragment }) => {
   );
 };
 
-function cardURL(story: StoryFragment) {
-  // href attribute doesn't work correctly due to bug
-  // https://github.com/ionic-team/ionic/issues/19241
-  return story.url ? { onClick: () => window.open(story.url!, '_blank') } : {};
-}
-
 function getHost(url: string | null) {
   if (!url) {
     return null;
   }
   const u = new URL(url);
-  return <IonCardSubtitle>{u.host}</IonCardSubtitle>;
+  return u.host;
 }
 
 function storyDetail(story: StoryFragment): string {
