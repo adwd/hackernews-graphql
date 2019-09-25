@@ -49,6 +49,10 @@ func (r *queryResolver) Comment(ctx context.Context, id int) (*models.Comment, e
 	return hackernews.GetComment(ctx, id)
 }
 
+func (r *queryResolver) Hatena(ctx context.Context, input *HatenaInput) ([]*HatenaEntry, error) {
+	panic("not implemented")
+}
+
 type storyResolver struct{ *Resolver }
 
 func (r *storyResolver) OgpImage(ctx context.Context, obj *models.Story) (*string, error) {

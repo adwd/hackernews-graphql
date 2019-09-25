@@ -21,8 +21,33 @@ type Comment {
   kids: [Comment!]!
 }
 
+type HatenaEntry {
+  url: String!
+  hatebUrl: String!
+  imageUrl: String
+  title: String!
+}
+
+enum HatenaCategory {
+  Technology
+}
+
+enum HatenaListType {
+  Popular
+  New
+}
+
+input HatenaInput {
+  limit: Int
+  offset: Int
+  category: HatenaCategory!
+  listType: HatenaListType!
+}
+
 type Query {
   stories(limit: Int, offset: Int): [Story!]!
   story(id: ID!): Story
   comment(id: ID!): Comment
+
+  hatena(input: HatenaInput): [HatenaEntry!]!
 }

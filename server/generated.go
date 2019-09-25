@@ -54,8 +54,16 @@ type ComplexityRoot struct {
 		Type   func(childComplexity int) int
 	}
 
+	HatenaEntry struct {
+		HatebURL func(childComplexity int) int
+		ImageURL func(childComplexity int) int
+		Title    func(childComplexity int) int
+		URL      func(childComplexity int) int
+	}
+
 	Query struct {
 		Comment func(childComplexity int, id int) int
+		Hatena  func(childComplexity int, input *HatenaInput) int
 		Stories func(childComplexity int, limit *int, offset *int) int
 		Story   func(childComplexity int, id int) int
 	}
@@ -81,6 +89,7 @@ type QueryResolver interface {
 	Stories(ctx context.Context, limit *int, offset *int) ([]*models.Story, error)
 	Story(ctx context.Context, id int) (*models.Story, error)
 	Comment(ctx context.Context, id int) (*models.Comment, error)
+	Hatena(ctx context.Context, input *HatenaInput) ([]*HatenaEntry, error)
 }
 type StoryResolver interface {
 	OgpImage(ctx context.Context, obj *models.Story) (*string, error)
@@ -151,6 +160,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.Type(childComplexity), true
 
+	case "HatenaEntry.hatebUrl":
+		if e.complexity.HatenaEntry.HatebURL == nil {
+			break
+		}
+
+		return e.complexity.HatenaEntry.HatebURL(childComplexity), true
+
+	case "HatenaEntry.imageUrl":
+		if e.complexity.HatenaEntry.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.HatenaEntry.ImageURL(childComplexity), true
+
+	case "HatenaEntry.title":
+		if e.complexity.HatenaEntry.Title == nil {
+			break
+		}
+
+		return e.complexity.HatenaEntry.Title(childComplexity), true
+
+	case "HatenaEntry.url":
+		if e.complexity.HatenaEntry.URL == nil {
+			break
+		}
+
+		return e.complexity.HatenaEntry.URL(childComplexity), true
+
 	case "Query.comment":
 		if e.complexity.Query.Comment == nil {
 			break
@@ -162,6 +199,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Comment(childComplexity, args["id"].(int)), true
+
+	case "Query.hatena":
+		if e.complexity.Query.Hatena == nil {
+			break
+		}
+
+		args, err := ec.field_Query_hatena_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Hatena(childComplexity, args["input"].(*HatenaInput)), true
 
 	case "Query.stories":
 		if e.complexity.Query.Stories == nil {
@@ -329,10 +378,35 @@ type Comment {
   kids: [Comment!]!
 }
 
+type HatenaEntry {
+  url: String!
+  hatebUrl: String!
+  imageUrl: String
+  title: String!
+}
+
+enum HatenaCategory {
+  Technology
+}
+
+enum HatenaListType {
+  Popular
+  New
+}
+
+input HatenaInput {
+  limit: Int
+  offset: Int
+  category: HatenaCategory!
+  listType: HatenaListType!
+}
+
 type Query {
   stories(limit: Int, offset: Int): [Story!]!
   story(id: ID!): Story
   comment(id: ID!): Comment
+
+  hatena(input: HatenaInput): [HatenaEntry!]!
 }
 `},
 )
@@ -366,6 +440,20 @@ func (ec *executionContext) field_Query_comment_args(ctx context.Context, rawArg
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_hatena_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *HatenaInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalOHatenaInput2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -700,6 +788,151 @@ func (ec *executionContext) _Comment_kids(ctx context.Context, field graphql.Col
 	return ec.marshalNComment2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _HatenaEntry_url(ctx context.Context, field graphql.CollectedField, obj *HatenaEntry) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "HatenaEntry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HatenaEntry_hatebUrl(ctx context.Context, field graphql.CollectedField, obj *HatenaEntry) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "HatenaEntry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HatebURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HatenaEntry_imageUrl(ctx context.Context, field graphql.CollectedField, obj *HatenaEntry) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "HatenaEntry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HatenaEntry_title(ctx context.Context, field graphql.CollectedField, obj *HatenaEntry) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "HatenaEntry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_stories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -824,6 +1057,50 @@ func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.Co
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOComment2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚋmodelsᚐComment(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_hatena(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_hatena_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Hatena(rctx, args["input"].(*HatenaInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*HatenaEntry)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNHatenaEntry2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaEntry(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2416,6 +2693,42 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputHatenaInput(ctx context.Context, obj interface{}) (HatenaInput, error) {
+	var it HatenaInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "limit":
+			var err error
+			it.Limit, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "offset":
+			var err error
+			it.Offset, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "category":
+			var err error
+			it.Category, err = ec.unmarshalNHatenaCategory2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaCategory(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "listType":
+			var err error
+			it.ListType, err = ec.unmarshalNHatenaListType2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaListType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2490,6 +2803,45 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var hatenaEntryImplementors = []string{"HatenaEntry"}
+
+func (ec *executionContext) _HatenaEntry(ctx context.Context, sel ast.SelectionSet, obj *HatenaEntry) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, hatenaEntryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HatenaEntry")
+		case "url":
+			out.Values[i] = ec._HatenaEntry_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "hatebUrl":
+			out.Values[i] = ec._HatenaEntry_hatebUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "imageUrl":
+			out.Values[i] = ec._HatenaEntry_imageUrl(ctx, field, obj)
+		case "title":
+			out.Values[i] = ec._HatenaEntry_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2539,6 +2891,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_comment(ctx, field)
+				return res
+			})
+		case "hatena":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_hatena(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "__type":
@@ -2950,6 +3316,75 @@ func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋadwdᚋhackernews�
 	return ec._Comment(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNHatenaCategory2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaCategory(ctx context.Context, v interface{}) (HatenaCategory, error) {
+	var res HatenaCategory
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalNHatenaCategory2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaCategory(ctx context.Context, sel ast.SelectionSet, v HatenaCategory) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNHatenaEntry2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaEntry(ctx context.Context, sel ast.SelectionSet, v HatenaEntry) graphql.Marshaler {
+	return ec._HatenaEntry(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNHatenaEntry2ᚕᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaEntry(ctx context.Context, sel ast.SelectionSet, v []*HatenaEntry) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNHatenaEntry2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaEntry(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNHatenaEntry2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaEntry(ctx context.Context, sel ast.SelectionSet, v *HatenaEntry) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._HatenaEntry(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNHatenaListType2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaListType(ctx context.Context, v interface{}) (HatenaListType, error) {
+	var res HatenaListType
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalNHatenaListType2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaListType(ctx context.Context, sel ast.SelectionSet, v HatenaListType) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {
 	return graphql.UnmarshalIntID(v)
 }
@@ -3301,6 +3736,18 @@ func (ec *executionContext) marshalOComment2ᚖgithubᚗcomᚋadwdᚋhackernews�
 		return graphql.Null
 	}
 	return ec._Comment(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOHatenaInput2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaInput(ctx context.Context, v interface{}) (HatenaInput, error) {
+	return ec.unmarshalInputHatenaInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOHatenaInput2ᚖgithubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaInput(ctx context.Context, v interface{}) (*HatenaInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOHatenaInput2githubᚗcomᚋadwdᚋhackernewsᚑgraphqlᚋserverᚐHatenaInput(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
