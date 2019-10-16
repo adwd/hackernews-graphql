@@ -1,0 +1,1 @@
+declare var SafariViewController: any;
