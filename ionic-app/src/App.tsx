@@ -3,6 +3,7 @@ import { Route } from 'react-router-dom';
 import { IonApp, IonPage, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
+import HomeWithSuspense from './pages/HomeWithSuspense';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -25,12 +26,13 @@ import './theme/variables.css';
 
 import './theme/hacker-news.css';
 
-const App: React.FunctionComponent = () => (
+const App = () => (
   <IonApp>
     <IonReactRouter>
       <IonPage>
         <IonRouterOutlet>
-          <Route path="/" component={Home} exact={true} />
+          <Route path="/" component={HomeWithSuspense} exact={true} />
+          <Route path="/no-suspense/" component={Home} />
         </IonRouterOutlet>
       </IonPage>
     </IonReactRouter>
