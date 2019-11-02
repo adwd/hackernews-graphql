@@ -6,11 +6,10 @@ import { ApolloProvider } from '@apollo/react-hooks';
 import { client } from './graphql/apollo';
 import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <ApolloProvider client={client}>
     <App />
   </ApolloProvider>,
-  document.getElementById('root'),
 );
 
-serviceWorker.register();
+serviceWorker.unregister();

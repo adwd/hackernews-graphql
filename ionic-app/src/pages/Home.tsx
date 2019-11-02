@@ -112,7 +112,7 @@ const Home = () => {
   );
 };
 
-const HackerHeader = () => (
+export const HackerHeader = () => (
   <IonHeader>
     <IonToolbar color="hack">
       <IonTitle>Hacker News Clone</IonTitle>
