@@ -4,6 +4,7 @@ import { IonApp, IonPage, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import HomeWithSuspense from './pages/HomeWithSuspense';
+import HomeByRelay from './pages/HomeByRelay';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -31,7 +32,8 @@ const App = () => (
     <IonReactRouter>
       <IonPage>
         <IonRouterOutlet>
-          <Route path="/" component={HomeWithSuspense} exact={true} />
+          <Route path="/" component={HomeByRelay} exact={true} />
+          <Route path="/suspense/" component={HomeWithSuspense} />
           <Route path="/no-suspense/" component={Home} />
         </IonRouterOutlet>
       </IonPage>

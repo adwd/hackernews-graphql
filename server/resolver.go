@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/adwd/hackernews-graphql/server/hackernews"
@@ -24,6 +25,9 @@ func (r *Resolver) Story() StoryResolver {
 
 type commentResolver struct{ *Resolver }
 
+func (r *commentResolver) ID(ctx context.Context, obj *models.Comment) (string, error) {
+	return strconv.FormatInt(obj.ID, 10), nil
+}
 func (r *commentResolver) Kids(ctx context.Context, obj *models.Comment) ([]*models.Comment, error) {
 	if obj == nil || len(obj.Kids) == 0 {
 		return []*models.Comment{}, nil
@@ -37,27 +41,35 @@ func (r *commentResolver) Kids(ctx context.Context, obj *models.Comment) ([]*mod
 
 type queryResolver struct{ *Resolver }
 
-func (r *queryResolver) Stories(ctx context.Context, limit, offset *int) ([]*models.Story, error) {
+func (r *queryResolver) Stories(ctx context.Context, limit *int, offset *int) ([]*models.Story, error) {
 	return hackernews.GetTopStories(ctx, limit, offset)
 }
-
-func (r *queryResolver) Story(ctx context.Context, id int) (*models.Story, error) {
-	return hackernews.GetStory(ctx, id)
+func (r *queryResolver) Story(ctx context.Context, id string) (*models.Story, error) {
+	_id, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	return hackernews.GetStory(ctx, int(_id))
 }
-
-func (r *queryResolver) Comment(ctx context.Context, id int) (*models.Comment, error) {
-	return hackernews.GetComment(ctx, id)
+func (r *queryResolver) Comment(ctx context.Context, id string) (*models.Comment, error) {
+	_id, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	return hackernews.GetComment(ctx, int(_id))
 }
 
 type storyResolver struct{ *Resolver }
 
+func (r *storyResolver) ID(ctx context.Context, obj *models.Story) (string, error) {
+	return strconv.FormatInt(obj.ID, 10), nil
+}
 func (r *storyResolver) OgpImage(ctx context.Context, obj *models.Story) (*string, error) {
 	if obj != nil && obj.URL != "" {
 		return hackernews.GetOGPImage(obj.URL)
 	}
 	return nil, nil
 }
-
 func (r *storyResolver) Kids(ctx context.Context, obj *models.Story) ([]*models.Comment, error) {
 	// if only id is required, supress to fetch comment
 	fields := graphql.CollectAllFields(ctx)
