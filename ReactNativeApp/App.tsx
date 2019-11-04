@@ -4,36 +4,25 @@ import { Container, Text } from 'native-base';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 
-type State = {
-  isReady: boolean;
-};
-
-export default class App extends React.Component<{}, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isReady: false,
-    };
-  }
-
-  async componentDidMount() {
-    await Font.loadAsync({
+const App = () => {
+  const [isReady, setIsReady] = React.useState(false);
+  React.useEffect(() => {
+    Font.loadAsync({
       Roboto: require('native-base/Fonts/Roboto.ttf'),
       Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
       ...Ionicons.font,
-    });
-    this.setState({ isReady: true });
+    }).then(() => setIsReady(true));
+  }, []);
+
+  if (!isReady) {
+    return <AppLoading />;
   }
 
-  render() {
-    if (!this.state.isReady) {
-      return <AppLoading />;
-    }
+  return (
+    <Container>
+      <Text>Open up App.js to start working on your app!</Text>
+    </Container>
+  );
+};
 
-    return (
-      <Container>
-        <Text>Open up App.js to start working on your app!</Text>
-      </Container>
-    );
-  }
-}
+export default App;
