@@ -55,9 +55,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Comment func(childComplexity int, id int) int
+		Comment func(childComplexity int, id string) int
 		Stories func(childComplexity int, limit *int, offset *int) int
-		Story   func(childComplexity int, id int) int
+		Story   func(childComplexity int, id string) int
 	}
 
 	Story struct {
@@ -75,14 +75,18 @@ type ComplexityRoot struct {
 }
 
 type CommentResolver interface {
+	ID(ctx context.Context, obj *models.Comment) (string, error)
+
 	Kids(ctx context.Context, obj *models.Comment) ([]*models.Comment, error)
 }
 type QueryResolver interface {
 	Stories(ctx context.Context, limit *int, offset *int) ([]*models.Story, error)
-	Story(ctx context.Context, id int) (*models.Story, error)
-	Comment(ctx context.Context, id int) (*models.Comment, error)
+	Story(ctx context.Context, id string) (*models.Story, error)
+	Comment(ctx context.Context, id string) (*models.Comment, error)
 }
 type StoryResolver interface {
+	ID(ctx context.Context, obj *models.Story) (string, error)
+
 	OgpImage(ctx context.Context, obj *models.Story) (*string, error)
 	Kids(ctx context.Context, obj *models.Story) ([]*models.Comment, error)
 }
@@ -161,7 +165,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Comment(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.Comment(childComplexity, args["id"].(string)), true
 
 	case "Query.stories":
 		if e.complexity.Query.Stories == nil {
@@ -185,7 +189,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Story(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.Story(childComplexity, args["id"].(string)), true
 
 	case "Story.by":
 		if e.complexity.Story.By == nil {
@@ -309,7 +313,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "schema.graphql", Input: `type Story {
   by: String!
   descendants: Int!
-  id: Int!
+  id: ID!
   score: Int!
   time: Int!
   title: String!
@@ -321,7 +325,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 
 type Comment {
   by: String!
-  id: Int!
+  id: ID!
   parent: Int!
   text: String!
   time: Int!
@@ -358,9 +362,9 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_comment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -394,9 +398,9 @@ func (ec *executionContext) field_Query_stories_args(ctx context.Context, rawArg
 func (ec *executionContext) field_Query_story_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
-		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -491,13 +495,13 @@ func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.Colle
 		Object:   "Comment",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Comment().ID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -509,10 +513,10 @@ func (ec *executionContext) _Comment_id(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int64)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNInt2int64(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Comment_parent(ctx context.Context, field graphql.CollectedField, obj *models.Comment) (ret graphql.Marshaler) {
@@ -770,7 +774,7 @@ func (ec *executionContext) _Query_story(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Story(rctx, args["id"].(int))
+		return ec.resolvers.Query().Story(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -811,7 +815,7 @@ func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.Co
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Comment(rctx, args["id"].(int))
+		return ec.resolvers.Query().Comment(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -988,13 +992,13 @@ func (ec *executionContext) _Story_id(ctx context.Context, field graphql.Collect
 		Object:   "Story",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Story().ID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1006,10 +1010,10 @@ func (ec *executionContext) _Story_id(ctx context.Context, field graphql.Collect
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int64)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNInt2int64(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Story_score(ctx context.Context, field graphql.CollectedField, obj *models.Story) (ret graphql.Marshaler) {
@@ -2441,10 +2445,19 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "id":
-			out.Values[i] = ec._Comment_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Comment_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "parent":
 			out.Values[i] = ec._Comment_parent(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2578,10 +2591,19 @@ func (ec *executionContext) _Story(ctx context.Context, sel ast.SelectionSet, ob
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "id":
-			out.Values[i] = ec._Story_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Story_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "score":
 			out.Values[i] = ec._Story_score(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2950,12 +2972,12 @@ func (ec *executionContext) marshalNComment2ᚖgithubᚗcomᚋadwdᚋhackernews�
 	return ec._Comment(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {
-	return graphql.UnmarshalIntID(v)
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	return graphql.UnmarshalID(v)
 }
 
-func (ec *executionContext) marshalNID2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
-	res := graphql.MarshalIntID(v)
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
 	if res == graphql.Null {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

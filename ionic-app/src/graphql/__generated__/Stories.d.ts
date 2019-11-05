@@ -8,12 +8,12 @@
 
 export interface Stories_stories_kids {
   __typename: "Comment";
-  id: number;
+  id: string;
 }
 
 export interface Stories_stories {
   __typename: "Story";
-  id: number;
+  id: string;
   title: string;
   url: string | null;
   ogpImage: string | null;

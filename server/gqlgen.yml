@@ -24,4 +24,4 @@ models:
     model: github.com/adwd/hackernews-graphql/server/models.Comment
   ID:
     model:
-      - github.com/99designs/gqlgen/graphql.IntID
+      - github.com/99designs/gqlgen/graphql.ID

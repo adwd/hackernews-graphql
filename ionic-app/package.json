@@ -13,8 +13,10 @@
     "@types/node": "11.11.3",
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.3",
+    "@types/react-relay": "^7.0.0",
     "@types/react-router": "^5.0.3",
     "@types/react-router-dom": "^4.3.1",
+    "@types/relay-runtime": "^6.0.9",
     "apollo": "^2.18.1",
     "apollo-boost": "^0.4.4",
     "cordova-plugin-safariviewcontroller": "^1.6.0",
@@ -24,18 +26,21 @@
     "ionicons": "^4.6.2",
     "react": "0.0.0-experimental-f6b8d31a7",
     "react-dom": "0.0.0-experimental-f6b8d31a7",
+    "react-relay": "0.0.0-experimental-a1a40b68",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.2.0",
+    "relay-runtime": "^7.0.0",
     "swr": "^0.1.5",
-    "typescript": "3.5.3"
+    "typescript": "3.6.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate": "apollo client:codegen --localSchemaFile='../server/schema.graphql' --target typescript --includes='./src/**/*' --tsFileExtension='d.ts' --outputFlat src/graphql/__generated__"
+    "generate": "apollo client:codegen --localSchemaFile='../server/schema.graphql' --target typescript --includes='./src/**/*' --tsFileExtension='d.ts' --outputFlat src/graphql/__generated__",
+    "relay": "relay-compiler --src ./src --schema ../server/schema.graphql --language typescript"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -48,6 +53,15 @@
   ],
   "description": "An Ionic project",
   "devDependencies": {
-    "@capacitor/cli": "1.2.1"
+    "@capacitor/cli": "1.2.1",
+    "babel-plugin-relay": "^7.0.0",
+    "graphql": "^14.5.8",
+    "relay-compiler": "^7.0.0",
+    "relay-compiler-language-typescript": "^10.1.0",
+    "relay-config": "^7.0.0"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "singleQuote": true
   }
 }
