@@ -1,5 +1,5 @@
 # build server
-FROM golang:1.13-alpine as go-builder
+FROM golang:1.15-alpine as go-builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ RUN go mod download
 RUN go build -o hn-server ./server/server.go
 
 # build frontend
-FROM node:10-alpine as node-builder
+FROM node:12-alpine as node-builder
 
 WORKDIR /app
 
