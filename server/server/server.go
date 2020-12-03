@@ -45,6 +45,6 @@ func main() {
 	)
 	router.Handle("/*", http.FileServer(http.Dir("static")))
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Printf("connect to http://localhost:%s/playground for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }
