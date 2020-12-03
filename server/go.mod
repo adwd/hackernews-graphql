@@ -8,7 +8,6 @@ require (
 	github.com/agnivade/levenshtein v1.1.0 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/go-chi/chi v3.3.2+incompatible
-	github.com/gorilla/websocket v1.4.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/rs/cors v1.6.0
 	github.com/vektah/gqlparser/v2 v2.1.0
