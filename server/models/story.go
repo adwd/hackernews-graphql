@@ -28,5 +28,4 @@ type Story struct {
 	Title       string  `json:"title"`
 	Type        string  `json:"type"`
 	URL         string  `json:"url"`
-	OGPImage    string  `json:"ogp_image"`
 }
